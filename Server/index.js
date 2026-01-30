@@ -1,5 +1,4 @@
 import express from 'express';
-import mysql from 'mysql';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 
@@ -13,42 +12,42 @@ app.use(cors({
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const dbConfig = {
-  host: 'bipahe9rkwlvxlekovgi-mysql.services.clever-cloud.com',
-  user: 'uj8yluob5umtrf1h',
-  password: 'Wz9X5MmCkdDl8sZCZkbK',
-  database: 'bipahe9rkwlvxlekovgi',
-};
+// Temporary in-memory store instead of MySQL
+const complaints = [];
 
-const connection = mysql.createConnection(dbConfig);
-
-connection.connect((err) => {
-  if (err) {
-    console.error('Error connecting to MySQL:', err.message);
-  } else {
-    console.log('Connected to MySQL database');
-  }
-});
-
+// API route to insert complaints
 app.post('/api/complaints', (req, res) => {
   const { name, nic, mobilenumber, email, department, subject, reportcontent, priority } = req.body;
 
-  const sql = `INSERT INTO Complaints (Name, NIC, \`Mobile Number\`, Email, Department, Subject, Content, Priority) 
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+  // Simple validation
+  if (!name || !nic || !mobilenumber || !email || !department || !subject || !reportcontent || !priority) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
 
-  connection.query(
-    sql,
-    [name, nic, mobilenumber, email, department, subject, reportcontent, priority],
-    (err, result) => {
-      if (err) {
-        console.error('Error inserting complaint:', err);
-        return res.status(500).json({ error: 'Database Error' });
-      }
-      res.json({ message: 'Complaint submitted successfully' });
-    }
-  );
+  const complaint = {
+    id: complaints.length + 1,
+    name,
+    nic,
+    mobilenumber,
+    email,
+    department,
+    subject,
+    reportcontent,
+    priority,
+    createdAt: new Date().toISOString(),
+  };
+
+  complaints.push(complaint);
+  res.json({ message: 'Complaint submitted successfully (stored in memory)', complaint });
 });
 
-app.listen(5004, () => {
-  console.log('Server is running on port 5004');
+// Optional: list complaints (for testing)
+app.get('/api/complaints', (req, res) => {
+  res.json({ count: complaints.length, complaints });
+});
+
+const PORT = process.env.PORT || 5004;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });

@@ -1,0 +1,92 @@
+/* Home.css */
+
+/* Set the background image for the home page */
+.home-container {
+  position: relative;
+  min-height: 100vh; /* Ensure the container covers the full viewport height */
+  background-image: url('../assests/img1.jpg'); /* Path to the background image */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover; /* Cover the entire container */
+}
+
+/* Add a semi-transparent overlay */
+.home-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Black overlay with 50% opacity */
+  z-index: 1; /* Place the overlay above the background image */
+}
+
+/* Ensure the content is above the overlay */
+.content {
+  position: relative;
+  z-index: 2; /* Place the content above the overlay */
+  padding: 50px;
+  color: white; /* Text color for better contrast */
+  text-align: center;
+  margin-top: 0vh; /* Adjust as needed */
+}
+
+/* Buttons.css */
+
+/* Container for the buttons */
+.button-container {
+  display: flex; /* Use Flexbox for horizontal alignment */
+  justify-content: center; /* Center the buttons horizontally */
+  gap: 20px; /* Space between the buttons */
+  margin-top: 20px; /* Adjust as needed */
+}
+
+/* Common button styles */
+.complaint-button,
+.suggestion-button {
+  padding: 12px 24px; /* Padding for the buttons */
+  font-size: 16px; /* Font size */
+  border: none; /* Remove default border */
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+  text-decoration: none; /* Remove underline from links */
+  color: white; /* Text color */
+  text-align: center; /* Center text */
+}
+
+/* Make a Complaint button */
+.complaint-button {
+  background-color: #dc3545; /* Red color */
+}
+
+.complaint-button:hover {
+  background-color: #c82333; /* Darker red on hover */
+}
+
+/* Make a Suggestion button */
+.suggestion-button {
+  background-color: #28a745; /* Green color */
+}
+
+.suggestion-button:hover {
+  background-color: #218838; /* Darker green on hover */
+}
+
+/* Description Section */
+.description {
+  max-width: 800px; /* Limit the width for better readability */
+  margin: 40px auto 0; /* Center the description and add space above */
+  text-align: left; /* Align text to the left */
+  font-size: 18px; /* Slightly larger font size */
+  line-height: 1.6; /* Improve readability with line height */
+}
+
+.description p {
+  margin-bottom: 20px; /* Add space between paragraphs */
+}
+
+.description strong {
+  color: #ffcc00; /* Highlight key phrases with a different color */
+}
