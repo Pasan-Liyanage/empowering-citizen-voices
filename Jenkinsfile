@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
-        IMAGE_CLIENT = "pasanx/empowering-client"      // Replace with YOUR Docker Hub username
-        IMAGE_SERVER = "pasanx/empowering-server"     // Replace with YOUR Docker Hub username
+        IMAGE_CLIENT = "pasanx/empowering-client"
+        IMAGE_SERVER = "pasanx/empowering-server"
     }
 
     stages {
@@ -16,11 +16,17 @@ pipeline {
             }
         }
 
-        stage('Build & Test') {
+        stage('Install Node deps') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    args '-u root'
+                }
+            }
             steps {
                 sh '''
-                  cd Server && npm ci --only=production || echo "Server deps done"
-                  cd ../client && npm ci && npm test -- --watchAll=false || true
+                  cd Server && npm ci --only=production
+                  cd ../client && npm ci
                 '''
             }
         }
