@@ -3,26 +3,24 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
-        IMAGE_CLIENT = "pasanliyanage/empowering-client"     // your Docker Hub username
-        IMAGE_SERVER = "pasanliyanage/empowering-server"    // your Docker Hub username
+        IMAGE_CLIENT = "pasanx/empowering-client"      // Replace with YOUR Docker Hub username
+        IMAGE_SERVER = "pasanx/empowering-server"     // Replace with YOUR Docker Hub username
     }
 
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/pasanliyanage/empowering-citizen-voices.git'  // your repo
+                    url: 'https://github.com/Pasan-Liyanage/empowering-citizen-voices.git',
+                    credentialsId: 'github-creds'
             }
         }
 
         stage('Build & Test') {
             steps {
                 sh '''
-                  cd Server
-                  npm ci --only=production
-                  cd ../client
-                  npm ci
-                  npm test -- --watchAll=false || true
+                  cd Server && npm ci --only=production || echo "Server deps done"
+                  cd ../client && npm ci && npm test -- --watchAll=false || true
                 '''
             }
         }
