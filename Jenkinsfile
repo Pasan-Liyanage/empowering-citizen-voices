@@ -3,8 +3,6 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
-        IMAGE_CLIENT = "pasanx/empowering-client"
-        IMAGE_SERVER = "pasanx/empowering-server"
     }
 
     stages {
@@ -16,7 +14,7 @@ pipeline {
             }
         }
 
-        stage('Install Node deps') {
+        stage('Build Backend') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -24,28 +22,30 @@ pipeline {
                 }
             }
             steps {
-                sh '''
-                  cd Server && npm ci --only=production
-                  cd ../client && npm ci
-                '''
+                sh 'cd Server && npm ci --only=production'
+                sh 'docker build -t pasanx/empowering-server:latest ./Server'
             }
         }
 
-        stage('Build Docker images') {
+        stage('Build Frontend') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    args '-u root'
+                }
+            }
             steps {
-                sh '''
-                  docker build -t ${IMAGE_SERVER}:latest ./Server
-                  docker build -t ${IMAGE_CLIENT}:latest ./client
-                '''
+                sh 'cd client && npm ci && npm run build'
+                sh 'docker build -t pasanx/empowering-client:latest ./client'
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('Push Images') {
             steps {
                 sh '''
                   echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin
-                  docker push ${IMAGE_SERVER}:latest
-                  docker push ${IMAGE_CLIENT}:latest
+                  docker push pasanx/empowering-server:latest
+                  docker push pasanx/empowering-client:latest
                 '''
             }
         }
