@@ -14,38 +14,38 @@ pipeline {
             }
         }
 
-        stage('Build Backend') {
+        stage('Backend') {
             agent {
                 docker {
                     image 'node:18-alpine'
-                    args '-u root'
+                    args '-u root --network jenkins-net'
                 }
             }
             steps {
                 sh 'cd Server && npm ci --only=production'
-                sh 'docker build -t pasanx/empowering-server:latest ./Server'
+                sh 'docker build -t pasanx/empowering-server:$BUILD_NUMBER ./Server'
             }
         }
 
-        stage('Build Frontend') {
+        stage('Frontend') {
             agent {
                 docker {
                     image 'node:18-alpine'
-                    args '-u root'
+                    args '-u root --network jenkins-net'
                 }
             }
             steps {
                 sh 'cd client && npm ci && npm run build'
-                sh 'docker build -t pasanx/empowering-client:latest ./client'
+                sh 'docker build -t pasanx/empowering-client:$BUILD_NUMBER ./client'
             }
         }
 
-        stage('Push Images') {
+        stage('Push') {
             steps {
                 sh '''
                   echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin
-                  docker push pasanx/empowering-server:latest
-                  docker push pasanx/empowering-client:latest
+                  docker push pasanx/empowering-server:$BUILD_NUMBER
+                  docker push pasanx/empowering-client:$BUILD_NUMBER
                 '''
             }
         }
