@@ -35,18 +35,18 @@ pipeline {
 
         stage('Build Images') {
             steps {
-                sh 'docker build -t pasanx/empowering-server:${BUILD_NUMBER} -t pasanx/empowering-server:latest ./Server'
-                sh 'docker build -t pasanx/empowering-client:${BUILD_NUMBER} -t pasanx/empowering-client:latest ./client'
+                sh 'docker build -t ${IMAGE_PREFIX}-server:${BUILD_NUMBER} -t ${IMAGE_PREFIX}-server:latest ./Server'
+                sh 'docker build -t ${IMAGE_PREFIX}-client:${BUILD_NUMBER} -t ${IMAGE_PREFIX}-client:latest ./client'
             }
         }
 
         stage('Push Images') {
             steps {
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                sh 'docker push pasanx/empowering-server:${BUILD_NUMBER}'
-                sh 'docker push pasanx/empowering-server:latest'
-                sh 'docker push pasanx/empowering-client:${BUILD_NUMBER}'
-                sh 'docker push pasanx/empowering-client:latest'
+                sh 'docker push ${IMAGE_PREFIX}-server:${BUILD_NUMBER}'
+                sh 'docker push ${IMAGE_PREFIX}-server:latest'
+                sh 'docker push ${IMAGE_PREFIX}-client:${BUILD_NUMBER}'
+                sh 'docker push ${IMAGE_PREFIX}-client:latest'
             }
         }
     }
