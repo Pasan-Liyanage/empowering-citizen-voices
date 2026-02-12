@@ -1,5 +1,5 @@
 pipeline {
-    agent any  // Uses the main Jenkins agent (our custom image with Node + Docker)
+    agent any
     
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
@@ -16,16 +16,15 @@ pipeline {
             }
         }
 
-        stage('Install & Test Backend') {
+        stage('Install Backend') {
             steps {
                 dir('Server') {
                     sh 'npm ci'
-                    // Uncomment if you have tests: sh 'npm test'
                 }
             }
         }
 
-        stage('Install & Build Frontend') {
+        stage('Build Frontend') {
             steps {
                 dir('client') {
                     sh 'npm ci'
@@ -34,37 +33,20 @@ pipeline {
             }
         }
 
-        stage('Build Docker Images') {
+        stage('Build Images') {
             steps {
-                script {
-                    // Build backend
-                    sh """
-                        docker build \
-                        -t ${IMAGE_PREFIX}-server:${BUILD_NUMBER} \
-                        -t ${IMAGE_PREFIX}-server:latest \
-                        ./Server
-                    """
-                    
-                    // Build frontend
-                    sh """
-                        docker build \
-                        -t ${IMAGE_PREFIX}-client:${BUILD_NUMBER} \
-                        -t ${IMAGE_PREFIX}-client:latest \
-                        ./client
-                    """
-                }
+                sh 'docker build -t pasanx/empowering-server:${BUILD_NUMBER} -t pasanx/empowering-server:latest ./Server'
+                sh 'docker build -t pasanx/empowering-client:${BUILD_NUMBER} -t pasanx/empowering-client:latest ./client'
             }
         }
 
-        stage('Push to Registry') {
+        stage('Push Images') {
             steps {
-                sh """
-                    echo \$DOCKERHUB_CREDENTIALS_PSW | docker login -u \$DOCKERHUB_CREDENTIALS_USR --password-stdin
-                    docker push ${IMAGE_PREFIX}-server:${BUILD_NUMBER}
-                    docker push ${IMAGE_PREFIX}-server:latest
-                    docker push ${IMAGE_PREFIX}-client:${BUILD_NUMBER}
-                    docker push ${IMAGE_PREFIX}-client:latest
-                '''
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                sh 'docker push pasanx/empowering-server:${BUILD_NUMBER}'
+                sh 'docker push pasanx/empowering-server:latest'
+                sh 'docker push pasanx/empowering-client:${BUILD_NUMBER}'
+                sh 'docker push pasanx/empowering-client:latest'
             }
         }
     }
