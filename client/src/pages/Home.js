@@ -17,7 +17,7 @@ export default function Home() {
             <Link to="/suggestions" className="suggestion-button">Make a Suggestion</Link>
           </div>
           <div className="description">
-            <h2>Welcome to Our Platform</h2>
+            <h2>Welcome to Our Platform !</h2>
             <p>
               At <strong>Empowering Citizen Voices</strong>, we believe that every voice matters. Our platform is designed
               to help you raise concerns, share ideas, and contribute to the betterment of your community.
