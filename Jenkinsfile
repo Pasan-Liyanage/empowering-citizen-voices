@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_PREFIX = 'pasanx/empowering'
         TERRAFORM_DIR = '/var/lib/jenkins/terraform-app'
+        SSH_KEY = '/var/lib/jenkins/devops-key.pem'
     }
 
     stages {
@@ -66,16 +67,14 @@ pipeline {
                         returnStdout: true
                     ).trim()
 
-                    sshagent(['ec2-key']) {
-                        sh """
-                            ssh -o StrictHostKeyChecking=no ubuntu@${app_ip} '
-                                sudo apt update &&
-                                sudo apt install -y docker.io docker-compose &&
-                                sudo systemctl start docker &&
-                                sudo usermod -aG docker ubuntu &&
-                                docker pull ${IMAGE_PREFIX}-server:latest &&
-                                docker pull ${IMAGE_PREFIX}-client:latest &&
-                                echo "version: \\"3\\"
+                    sh """
+                        ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ubuntu@${app_ip} '
+                            sudo apt update &&
+                            sudo apt install -y docker.io docker-compose &&
+                            sudo systemctl start docker &&
+                            docker pull ${IMAGE_PREFIX}-server:latest &&
+                            docker pull ${IMAGE_PREFIX}-client:latest &&
+                            echo "version: \\"3\\"
 services:
   server:
     image: ${IMAGE_PREFIX}-server:latest
@@ -87,11 +86,10 @@ services:
       - \\"80:80\\"
     depends_on:
       - server" > docker-compose.yml &&
-                                docker-compose down || true &&
-                                docker-compose up -d
-                            '
-                        """
-                    }
+                            docker-compose down || true &&
+                            docker-compose up -d
+                        '
+                    """
                 }
             }
         }
