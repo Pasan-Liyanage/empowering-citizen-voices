@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_PREFIX = 'pasanx/empowering'
-        TERRAFORM_DIR = '/home/ubuntu/terraform-app'
+        TERRAFORM_DIR = '/var/lib/jenkins/terraform-app'
     }
 
     stages {
